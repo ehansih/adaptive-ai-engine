@@ -2,6 +2,17 @@
 
 A secure, adaptive AI orchestration platform that integrates multiple AI providers, learns from user feedback, and stores portable local memory.
 
+## Screenshots
+
+### Web App
+![Web App](assets/screenshot-web.png)
+
+### Android APK
+![Android APK](assets/screenshot-android.png)
+
+### Architecture
+![Architecture](assets/architecture.png)
+
 ## Architecture
 
 ```
