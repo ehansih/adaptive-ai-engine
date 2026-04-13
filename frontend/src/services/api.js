@@ -1,21 +1,36 @@
 import axios from 'axios'
+import { secureGet, secureRemove, getBackendUrl } from './storage'
 
-const api = axios.create({
-  baseURL: '/api',
-  timeout: 120000,
-})
+// Resolve base URL at startup — Capacitor reads from secure storage,
+// web dev proxy uses /api which Vite forwards to localhost:8000
+const isCapacitorNative = () =>
+  typeof window !== 'undefined' && window?.Capacitor?.isNativePlatform?.()
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+async function resolveBaseUrl() {
+  if (isCapacitorNative()) {
+    const url = await getBackendUrl()
+    return url  // e.g. https://yourserver.com or http://192.168.1.x:8000
+  }
+  return '/api'  // Vite dev proxy → localhost:8000
+}
+
+const api = axios.create({ timeout: 120000 })
+
+// Set base URL once at startup
+resolveBaseUrl().then((url) => { api.defaults.baseURL = url })
+
+api.interceptors.request.use(async (config) => {
+  // Use secure storage on native, sessionStorage on web
+  const token = await secureGet('token')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
+  async (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('token')
+      await secureRemove('token')
       window.location.href = '/login'
     }
     return Promise.reject(err)

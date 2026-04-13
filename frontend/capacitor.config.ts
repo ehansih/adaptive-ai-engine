@@ -1,18 +1,22 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 const config: CapacitorConfig = {
   appId: 'com.ehansih.adaptiveai',
   appName: 'Adaptive AI Engine',
   webDir: 'dist',
-  server: {
-    // For development/testing: point to your local or deployed backend
-    // Change this to your server IP when testing on a real device
-    url: 'http://10.0.2.2:8000',   // Android emulator → host machine
-    cleartext: true,               // allow HTTP in dev (use HTTPS in prod)
-  },
+  // No hardcoded server URL — app reads VITE_API_URL at build time
+  // or falls back to the in-app settings screen for runtime configuration
+  ...(isDev && {
+    server: {
+      url: 'http://10.0.2.2:8000',  // emulator only — dev builds
+      cleartext: true,
+    },
+  }),
   android: {
     buildOptions: {
-      keystorePath: 'release.keystore',
+      keystorePath: process.env.KEYSTORE_PATH || 'release.keystore',
       keystorePassword: process.env.KEYSTORE_PASSWORD || '',
       keystoreAlias: 'adaptive-ai',
       keystoreAliasPassword: process.env.KEYSTORE_ALIAS_PASSWORD || '',

@@ -5,14 +5,16 @@ import ModelSelector from './components/ModelSelector'
 import MetricsPanel from './components/MetricsPanel'
 import MemoryViewer from './components/MemoryViewer'
 import LoginPage from './pages/LoginPage'
+import ServerSettings from './pages/ServerSettings'
 import { useAuthStore } from './hooks/useStore'
-import { Bot, LayoutDashboard, Brain, BarChart2, Settings, LogOut, Menu, X } from 'lucide-react'
+import { Bot, Brain, BarChart2, Settings, LogOut, Menu, X, ServerCog } from 'lucide-react'
 import clsx from 'clsx'
 
 function Layout() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
   const [sideTab, setSideTab] = useState('metrics')
+  const [showServerSettings, setShowServerSettings] = useState(false)
   const [rightOpen, setRightOpen] = useState(true)
 
   const handleLogout = () => { logout(); navigate('/login') }
@@ -44,6 +46,13 @@ function Layout() {
             </button>
           )}
           <button
+            onClick={() => setShowServerSettings(true)}
+            title="Server URL"
+            className="text-gray-500 hover:text-gray-300"
+          >
+            <ServerCog size={16} />
+          </button>
+          <button
             onClick={() => setRightOpen(!rightOpen)}
             className="text-gray-500 hover:text-gray-300"
           >
@@ -52,6 +61,7 @@ function Layout() {
         </div>
       </header>
 
+      {showServerSettings && <ServerSettings onClose={() => setShowServerSettings(false)} />}
       <div className="flex-1 flex overflow-hidden">
         {/* Main chat */}
         <div className="flex-1 overflow-hidden">
